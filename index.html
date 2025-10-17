@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>React</title>
+        <style>
+            * {
+                padding: 0;
+                margin: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                padding: 8px;
+                font-family: system-ui, -apple-system, BlinkMacSystemFont,
+                    "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+                    "Helvetica Neue", sans-serif;
+            }
+
+            .btns {
+                display: flex;
+                gap: 10px;
+                margin: 20px 0;
+            }
+
+            .btn {
+                display: inline-block;
+                padding: 6px 10px;
+                background: #ccc;
+                border: 1px solid transparent;
+                border-radius: 3px;
+                text-decoration: none;
+            }
+
+            .btn:hover {
+                cursor: pointer;
+                opacity: 0.9;
+            }
+
+            .primary {
+                color: #fff;
+                background: orange;
+            }
+
+            .rounded {
+                border-radius: 99px;
+            }
+
+            .bordered {
+                color: orange;
+                border-color: orange;
+                background: transparent;
+            }
+
+            .custom-btn {
+                background: red;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="root"></div>
+        <!--
+        1. Thêm React vào trang web (CDN) ✅
+            - react: Xây dựng các component (thành phần) -> DOM ảo (virtual DOM)
+            - react-dom: Cầu nối giữa react & DOM; render virtual DOM -> DOM thật
+        2. React.createElement() ✅
+        3. JSX (Babel) ✅
+        4. Cách tạo component ✅
+        5. Client Side Rendering (React) & Server Side Rendering
+        6. Tạo dự án React với Vite
+        -->
+        <script
+            crossorigin
+            src="https://unpkg.com/react@18/umd/react.development.js"
+        ></script>
+        <script
+            crossorigin
+            src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+        ></script>
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+        <script type="text/babel">
+            const heading = "Todo List";
+            const tasks = [
+                {
+                    id: 1,
+                    title: "Item 1",
+                },
+                {
+                    id: 2,
+                    title: "Item 2",
+                },
+                {
+                    id: 3,
+                    title: "Item 3",
+                },
+            ];
+
+            // Component trong React là một hàm đặt tên theo quy tắc viết hoa các chữ cái đầu của mỗi từ, ví dụ:
+            // "Header", "Sidebar", ...
+
+            /**
+             * Đây là: "Heading" component
+             * Khi sử dụng: <Heading type="h1" title="Hello" />
+             * Tương đương: React.createElement(Heading, { type: "h1", title: "Hello" })
+             */
+            const Heading = ({ type: Tag = "h1", title }) => {
+                return <Tag>{title}</Tag>;
+            };
+
+            /**
+             * Đây là: "Button" component
+             * Khi sử dụng: <Button primary>Click me!</Button>
+             * Tương đương: React.createElement(Button, { primary: true }, "Click me!")
+             */
+            function Button({
+                href,
+                primary,
+                rounded,
+                bordered,
+                className,
+                children,
+                ...passProps // lấy toàn bộ các props còn lại
+            }) {
+                const classNames = ["btn"]; // Mặc định có class "btn"
+
+                // Nếu có props tương ứng thì thêm class tương ứng
+                if (primary) classNames.push("primary");
+                if (rounded) classNames.push("rounded");
+                if (bordered) classNames.push("bordered");
+                if (className) classNames.push(className);
+
+                // Sử dụng thẻ "a" khi có href, mặc định dùng "button"
+                const Tag = href ? "a" : "button";
+
+                return (
+                    <Tag
+                        {...passProps} // Pass toàn bộ các props còn lại vào "Tag" (a hoặc button)
+                        className={classNames.join(" ")}
+                        href={href}
+                    >
+                        {children}
+                    </Tag>
+                );
+            }
+
+            /**
+             * Có 2 cách dùng Fragment
+             * 1. <React.Fragment>
+             * 2. <> (khuyến nghị)
+             */
+            const otherContent = (
+                <>
+                    <p>P1</p>
+                    <p>P2</p>
+                </>
+            );
+
+            /**
+             * Lưu ý khi dùng JSX:
+             * - "className" thay vì "class"
+             * - Sử dụng {} để viết JS expression
+             * - Sử dụng {...spread} trong thẻ mở
+             * - "true" props chỉ cần <Component isOpen /> thay vì <Component isOpen={true} />
+             * - Sử dụng array.map() không cần tới .join("")
+             * - Bất cứ React Element nào trong array cần sử dụng "key" props không trùng lặp
+             * - Các React elements luôn cần viết có "root", khuyến nghị dùng Fragment khi không cần thiết sinh ra một thẻ thật
+             */
+            const app = (
+                <>
+                    {otherContent}
+
+                    <Heading title="Hello world" />
+                    <Heading type="h2" title="Hello world" />
+
+                    <div className="btns">
+                        <Button type="button">Normal</Button>
+                        <Button type="submit" primary rounded bordered>
+                            Primary
+                        </Button>
+                        <Button rounded>Rounded</Button>
+                        <Button bordered>Bordered</Button>
+                        <Button
+                            primary
+                            href="https://google.com"
+                            target="_blank"
+                        >
+                            Google.com
+                        </Button>
+                    </div>
+
+                    <Heading title={heading} />
+                    <ul className="tasks-list">
+                        {tasks.map((task, index) => (
+                            <li
+                                key={index}
+                                className="task-item"
+                                title={task.title}
+                            >
+                                <a
+                                    href={`/tasks/${task.id}`}
+                                    className="task-link"
+                                >
+                                    {task.title}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                </>
+            );
+
+            ReactDOM.createRoot(document.querySelector("#root")).render(app);
+        </script>
+    </body>
+</html>
